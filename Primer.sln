@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleServer", "Sample\Simp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleClient", "Sample\SimpleClient\SimpleClient.csproj", "{498B0820-04AC-49F3-9C74-6404EA412EB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logs", "Plugin\Log\Logs.csproj", "{6AFF2DFB-A3D7-4207-8E72-53CE2587C6B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logs", "Plugin\Logs\Logs.csproj", "{6AFF2DFB-A3D7-4207-8E72-53CE2587C6B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
