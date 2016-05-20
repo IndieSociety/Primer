@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Primer.Logs
 {
-	public class File : Log.Sink
+	public class DateFile : Log.Sink
 	{
 		private readonly string name;
 		private readonly Encoding encoding;
@@ -14,7 +14,7 @@ namespace Primer.Logs
 		private int capacity;
 		private readonly byte[] newline;
 
-		public File(string path, Encoding e)
+		public DateFile(string path, Encoding e)
 		{
 			name = path;
 			encoding = e;
@@ -23,9 +23,9 @@ namespace Primer.Logs
 			capacity = 0;
 			newline = encoding.GetBytes("\n");
 		}
-		public File(string path) : this(path, Encoding.UTF8) { }
+		public DateFile(string path) : this(path, Encoding.UTF8) { }
 
-		~File()
+		~DateFile()
 		{
 			if (file != null)
 				file.Close();
