@@ -8,8 +8,15 @@ namespace Primer
 		public static void Load()
 		{
 			Console.WriteLine("load");
-			var task = Session<UTF8StringRequest>.Connect(new Session.Settings("localhost", 12306), 0);
-			task.Wait();
+			var task = Session<UTF8StringRequest>.Connect(new Session.Settings("localhost", 12306), 3000);
+			try
+			{
+				task.Wait();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.ToString());
+			}
 			s = task.Result;
 			UTF8StringRequest request = new UTF8StringRequest();
 			Console.OnInput += (text) =>
