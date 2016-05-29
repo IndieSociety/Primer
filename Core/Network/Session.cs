@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -503,11 +503,15 @@ namespace Primer
 	{
 		private readonly Pool<T> pool;
 		private T request;
+
 		internal Session(Loop loop, ISettings settings, Socket socket)
+			: this(loop, settings, socket, Pool<T>.Default) { }
+
+		internal Session(Loop loop, ISettings settings, Socket socket, Pool<T> pool)
 			: base(loop, settings, socket)
 		{
-			pool = new Pool<T>();
-			request = pool.Acquire();
+			this.pool = pool;
+			this.request = pool.Acquire();
 		}
 
 		internal override void OnReceive(byte[] bytes, int length)
@@ -536,7 +540,7 @@ namespace Primer
 			pool.Release(t);
 		}
 
-		public static Task<Session<T>> Connect(Loop loop, ISettings settings, int timeout)
+		public static Task<Session<T>> Connect(Loop loop, ISettings settings, int timeout, Pool<T> pool)
 		{
 			TaskCompletionSource<Session<T>> evt = new TaskCompletionSource<Session<T>>();
 			IPAddress ip;
@@ -546,12 +550,23 @@ namespace Primer
 				Socket socket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 				socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, new LingerOption(false, 0));
 				socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+				Timer timer = new Timer(state =>
+				{
+					socket.Close();
+				}, null, timeout, Timeout.Infinite);
 				socket.BeginConnect(ip, settings.port, result =>
 				{
 					try
 					{
+						timer.Dispose();
+					}
+					catch
+					{
+					}
+					try
+					{
 						socket.EndConnect(result);
-						Session<T> session = new Session<T>(loop, settings, socket);
+						Session<T> session = new Session<T>(loop, settings, socket, pool);
 						if (!evt.TrySetResult(session))
 						{
 							socket.Close();
@@ -593,12 +608,23 @@ namespace Primer
 						Socket socket = new Socket(family, SocketType.Stream, ProtocolType.Tcp);
 						socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, new LingerOption(false, 0));
 						socket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
+						Timer timer = new Timer(state =>
+						{
+							socket.Close();
+						}, null, timeout, Timeout.Infinite);
 						socket.BeginConnect(iplist, settings.port, result =>
 						{
 							try
 							{
+								timer.Dispose();
+							}
+							catch
+							{
+							}
+							try
+							{
 								socket.EndConnect(result);
-								Session<T> session = new Session<T>(loop, settings, socket);
+								Session<T> session = new Session<T>(loop, settings, socket, pool);
 								if (!evt.TrySetResult(session))
 								{
 									socket.Close();
@@ -631,9 +657,17 @@ namespace Primer
 			}
 			return evt.Task;
 		}
+		public static Task<Session<T>> Connect(ISettings settings, int timeout, Pool<T> pool)
+		{
+			return Connect(Loop.Current, settings, timeout, pool);
+		}
+		public static Task<Session<T>> Connect(Loop loop, ISettings settings, int timeout)
+		{
+			return Connect(loop, settings, timeout, Pool<T>.Default);
+		}
 		public static Task<Session<T>> Connect(ISettings settings, int timeout)
 		{
-			return Connect(Loop.Current, settings, timeout);
+			return Connect(Loop.Current, settings, timeout, Pool<T>.Default);
 		}
 	}
 }

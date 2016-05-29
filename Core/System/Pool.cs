@@ -23,5 +23,7 @@ namespace Primer
 		{
 			stack.Push(item);
 		}
+
+		public static readonly Pool<T> Default = new Pool<T>();
 	}
 }

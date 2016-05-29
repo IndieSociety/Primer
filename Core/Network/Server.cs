@@ -296,14 +296,24 @@ namespace Primer
 	public sealed class Server<T> : Server
 		where T : Request, new()
 	{
+		private readonly Pool<T> pool;
+
+		public Server(Loop loop, ISettings settings, Pool<T> pool)
+			: base(loop, settings)
+		{
+			this.pool = pool;
+		}
+		public Server(ISettings settings, Pool<T> pool)
+			: this(Loop.Current, settings, pool) { }
+
 		public Server(Loop loop, ISettings settings)
-			: base(loop, settings) { }
+			: this(loop, settings, Pool<T>.Default) { }
 		public Server(ISettings settings)
-			: base(Loop.Current, settings) { }
+			: this(Loop.Current, settings, Pool<T>.Default) { }
 
 		internal override Session OnAccept(Socket socket)
 		{
-			return new Session<T>(_loop, _settings, socket);
+			return new Session<T>(_loop, _settings, socket, pool);
 		}
 	}
 }
