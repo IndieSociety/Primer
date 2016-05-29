@@ -553,7 +553,7 @@ namespace Primer
 				Timer timer = new Timer(state =>
 				{
 					socket.Close();
-				}, null, timeout, Timeout.Infinite);
+				}, null, Timeout.Infinite, Timeout.Infinite);
 				socket.BeginConnect(ip, settings.port, result =>
 				{
 					try
@@ -577,6 +577,10 @@ namespace Primer
 							session.Start();
 						});
 					}
+					catch (ObjectDisposedException e)
+					{
+						evt.TrySetException(new TimeoutException());
+					}
 					catch (Exception e)
 					{
 						evt.TrySetException(e);
@@ -586,6 +590,7 @@ namespace Primer
 						loop.Release();
 					}
 				}, null);
+				timer.Change(timeout, Timeout.Infinite);
 			}
 			else
 			{
@@ -611,7 +616,7 @@ namespace Primer
 						Timer timer = new Timer(state =>
 						{
 							socket.Close();
-						}, null, timeout, Timeout.Infinite);
+						}, null, Timeout.Infinite, Timeout.Infinite);
 						socket.BeginConnect(iplist, settings.port, result =>
 						{
 							try
@@ -635,6 +640,10 @@ namespace Primer
 									session.Start();
 								});
 							}
+							catch (ObjectDisposedException e)
+							{
+								evt.TrySetException(new TimeoutException());
+							}
 							catch (Exception e)
 							{
 								evt.TrySetException(e);
@@ -644,6 +653,7 @@ namespace Primer
 								loop.Release();
 							}
 						}, null);
+						timer.Change(timeout, Timeout.Infinite);
 					}
 					catch (Exception e)
 					{
