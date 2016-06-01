@@ -12,7 +12,9 @@ namespace Primer
 			UTF8StringRequest.DefaultHandler += delegate(Session session, string str)
 			{
 				Console.WriteLine(str);
-				
+				UTF8StringRequest request = new UTF8StringRequest {Value = "Echo " + str};
+				request.Send(session);
+				session.Flush();
 			};
 			s.Start();
 		}
