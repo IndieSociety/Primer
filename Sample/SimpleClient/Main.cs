@@ -21,7 +21,7 @@ namespace Primer
 			UTF8StringRequest request = new UTF8StringRequest();
 			Console.OnInput += (text) =>
 			{
-				request.Data = text;
+				request.Value = text;
 				request.Send(s);
 				s.Flush();
 			};

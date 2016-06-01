@@ -111,6 +111,34 @@ namespace Primer
 			}
 		}
 
+		public IPEndPoint Remote
+		{
+			get
+			{
+				return _socket.RemoteEndPoint as IPEndPoint;
+			}
+		}
+
+		public IPEndPoint Local
+		{
+			get
+			{
+				return _socket.LocalEndPoint as IPEndPoint;
+			}
+		}
+
+		public short TTL
+		{
+			get { return _socket.Ttl; }
+			set { _socket.Ttl = value; }
+		}
+
+		public bool NoDelay
+		{
+			get { return _socket.NoDelay; }
+			set { _socket.NoDelay = value; }
+		}
+
 		protected Session(Loop loop, ISettings settings, Socket socket)
 		{
 			_loop = loop;

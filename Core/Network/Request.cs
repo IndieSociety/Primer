@@ -100,7 +100,7 @@ namespace Primer
 				_length = 0;
 			}
 
-			public static ConcurrentStack<ByteBuffer> freelist = new ConcurrentStack<ByteBuffer>();
+			private static readonly ConcurrentStack<ByteBuffer> freelist = new ConcurrentStack<ByteBuffer>();
 
 			public static ByteBuffer New()
 			{
@@ -166,10 +166,10 @@ namespace Primer
 
 	public abstract class Request<T> : Request
 	{
-		public T Data;
+		public T Value;
 		internal override void Execute()
 		{
-			Handle(Data);
+			Handle(Value);
 		}
 
 		protected virtual void Handle(T t)
@@ -184,10 +184,10 @@ namespace Primer
 	public abstract class Request<TKey, T> : Request
 	{
 		public TKey ID;
-		public T Data;
+		public T Value;
 		internal override void Execute()
 		{
-			Handle(ID, Data);
+			Handle(ID, Value);
 		}
 
 		protected virtual void Handle(TKey k, T t)
@@ -231,7 +231,7 @@ namespace Primer
 		{
 			if (bytes[offset + length - 1] == 0)
 			{
-				Data = System.Text.Encoding.UTF8.GetString(bytes, offset, length - 1);
+				Value = System.Text.Encoding.UTF8.GetString(bytes, offset, length - 1);
 				return length;
 			}
 			return 0;
@@ -239,7 +239,7 @@ namespace Primer
 
 		public override bool Send(Session session)
 		{
-			if (!session.Write(System.Text.Encoding.UTF8.GetBytes(Data)))
+			if (!session.Write(System.Text.Encoding.UTF8.GetBytes(Value)))
 				return false;
 			if (!session.Write(0))
 				return false;
@@ -248,7 +248,7 @@ namespace Primer
 
 		public override void Reset()
 		{
-			Data = null;
+			Value = null;
 		}
 	}
 }
