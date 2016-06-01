@@ -9,7 +9,11 @@ namespace Primer
 		{
 			Console.WriteLine("load");
 			s = new Server<UTF8StringRequest>(new Server.Settings(12306));
-			UTF8StringRequest.DefaultHandler += Console.WriteLine;
+			UTF8StringRequest.DefaultHandler += delegate(Session session, string str)
+			{
+				Console.WriteLine(str);
+				
+			};
 			s.Start();
 		}
 

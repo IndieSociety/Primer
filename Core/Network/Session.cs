@@ -359,7 +359,7 @@ namespace Primer
 			else if (action.request != null)
 			{
 				_settings.request(this, action.request);
-				action.request.Execute();
+				action.request.Execute(this);
 				OnRequestRelease(action.request);
 			}
 			else if (action.length != 0)

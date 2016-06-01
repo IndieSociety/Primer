@@ -159,7 +159,7 @@ namespace Primer
 		}
 
 		protected abstract int Test(byte[] bytes, int offset, int length);
-		internal abstract void Execute();
+		internal abstract void Execute(Session session);
 		public abstract bool Send(Session session);
 		public virtual void Reset() { }
 	}
@@ -167,52 +167,52 @@ namespace Primer
 	public abstract class Request<T> : Request
 	{
 		public T Value;
-		internal override void Execute()
+		internal override void Execute(Session session)
 		{
-			Handle(Value);
+			Handle(session, Value);
 		}
 
-		protected virtual void Handle(T t)
+		protected virtual void Handle(Session session, T t)
 		{
 			if (DefaultHandler != null)
-				DefaultHandler(t);
+				DefaultHandler(session, t);
 		}
 
-		public static event Action<T> DefaultHandler;
+		public static event Action<Session, T> DefaultHandler;
 	}
 
 	public abstract class Request<TKey, T> : Request
 	{
 		public TKey ID;
 		public T Value;
-		internal override void Execute()
+		internal override void Execute(Session session)
 		{
-			Handle(ID, Value);
+			Handle(session, ID, Value);
 		}
 
-		protected virtual void Handle(TKey k, T t)
+		protected virtual void Handle(Session session, TKey k, T t)
 		{
-			Action<T> action;
+			Action<Session, T> action;
 			if (_Handlers.TryGetValue(k, out action))
 			{
-				action(t);
+				action(session, t);
 			}
 			else
 			{
 				if (DefaultHandler != null)
-					DefaultHandler(k, t);
+					DefaultHandler(session, k, t);
 			}
 		}
 
-		private static readonly Dictionary<TKey, Action<T>> _Handlers = new Dictionary<TKey, Action<T>>();
-		public static Dictionary<TKey, Action<T>> Handlers
+		private static readonly Dictionary<TKey, Action<Session, T>> _Handlers = new Dictionary<TKey, Action<Session, T>>();
+		public static Dictionary<TKey, Action<Session, T>> Handlers
 		{
 			get
 			{
 				return _Handlers;
 			}
 		}
-		public static event Action<TKey, T> DefaultHandler;
+		public static event Action<Session, TKey, T> DefaultHandler;
 	}
 
 	public class UTF8StringRequest : Request<string>
