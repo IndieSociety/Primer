@@ -552,14 +552,15 @@ namespace Primer
 				{
 					offset += size;
 					size = length - offset;
-					AddAction(request);
+					var old = request;
 					request = pool.Acquire();
+					AddAction(old);
 				}
 			}
 			catch (Exception e)
 			{
-				AddAction(e);
 				Close();
+				AddAction(e);
 			}
 		}
 
