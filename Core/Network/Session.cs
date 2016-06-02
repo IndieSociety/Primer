@@ -546,18 +546,20 @@ namespace Primer
 		{
 			int offset = 0;
 			int size = length - offset;
-			while (size > 0 && request.Input(bytes, offset, ref size))
+			try
 			{
-				if (size < 0)
+				while (size > 0 && request.Input(bytes, offset, ref size))
 				{
-					AddAction(new RequestException(-size));
-					Close();
-					return;
+					offset += size;
+					size = length - offset;
+					AddAction(request);
+					request = pool.Acquire();
 				}
-				offset += size;
-				size = length - offset;
-				AddAction(request);
-				request = pool.Acquire();
+			}
+			catch (Exception e)
+			{
+				AddAction(e);
+				Close();
 			}
 		}
 

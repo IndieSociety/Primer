@@ -15,7 +15,7 @@ namespace Primer
 		/// <summary>
 		/// 请求接收缓冲区
 		/// </summary>
-		private class ByteBuffer
+		protected class ByteBuffer
 		{
 			private byte[] _array;
 			public byte[] array
@@ -133,32 +133,25 @@ namespace Primer
 			int len = length;
 			while (len > 0)
 			{
-				int l = PreTest(bytes, offset, len);
-				buffer.Write(bytes, offset, l);
+				int l = PreTest(buffer, bytes, offset, length);
 				offset += l;
 				len -= l;
-				int tl = Test(buffer.array, buffer.offset, buffer.length);
-				if (tl > 0)
+				if (Test(buffer))
 				{
-					buffer.Pop(tl);
 					length -= len;
-					return true;
-				}
-				if (tl < 0)
-				{
-					length = tl;
 					return true;
 				}
 			}
 			return false;
 		}
 
-		protected virtual int PreTest(byte[] bytes, int offset, int length)
+		protected virtual int PreTest(ByteBuffer buffer, byte[] bytes, int offset, int length)
 		{
+			buffer.Write(bytes, offset, length);
 			return length;
 		}
 
-		protected abstract int Test(byte[] bytes, int offset, int length);
+		protected abstract bool Test(ByteBuffer buffer);
 		internal abstract void Execute(Session session);
 		public abstract bool Send(Session session);
 		public virtual void Reset() { }
@@ -217,24 +210,30 @@ namespace Primer
 
 	public class UTF8StringRequest : Request<string>
 	{
-		protected override int PreTest(byte[] bytes, int offset, int length)
+		protected override int PreTest(ByteBuffer buffer, byte[] bytes, int offset, int length)
 		{
+			int len = length;
 			for (int i = offset; i < length; ++i)
 			{
 				if (bytes[i] == 0)
-					return i - offset + 1;
+				{
+					len = i - offset + 1;
+					break;
+				}
 			}
-			return length;
+			buffer.Write(bytes, offset, len);
+			return len;
 		}
 
-		protected override int Test(byte[] bytes, int offset, int length)
+		protected override bool Test(ByteBuffer buffer)
 		{
-			if (bytes[offset + length - 1] == 0)
+			if (buffer.array[buffer.offset + buffer.length - 1] == 0)
 			{
-				Value = System.Text.Encoding.UTF8.GetString(bytes, offset, length - 1);
-				return length;
+				Value = System.Text.Encoding.UTF8.GetString(buffer.array, buffer.offset, buffer.length - 1);
+				buffer.Reset();
+				return true;
 			}
-			return 0;
+			return false;
 		}
 
 		public override bool Send(Session session)
