@@ -112,6 +112,7 @@ namespace Primer
 
 			public void Release()
 			{
+				Reset();
 				freelist.Push(this);
 			}
 		}
@@ -145,16 +146,15 @@ namespace Primer
 			return false;
 		}
 
-		protected virtual int PreTest(ByteBuffer buffer, byte[] bytes, int offset, int length)
-		{
-			buffer.Write(bytes, offset, length);
-			return length;
-		}
-
+		protected abstract int PreTest(ByteBuffer buffer, byte[] bytes, int offset, int length);
 		protected abstract bool Test(ByteBuffer buffer);
 		internal abstract void Execute(Session session);
 		public abstract bool Send(Session session);
-		public virtual void Reset() { }
+
+		public virtual void Reset()
+		{
+			buffer.Reset();
+		}
 	}
 
 	public abstract class Request<T> : Request
@@ -247,6 +247,7 @@ namespace Primer
 
 		public override void Reset()
 		{
+			base.Reset();
 			Value = null;
 		}
 	}
