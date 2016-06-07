@@ -116,9 +116,9 @@ namespace Primer
 			_loop = loop;
 			_settings = settings;
 			if (string.IsNullOrEmpty(_settings.ip))
-				_endpoint = new IPEndPoint(IPAddress.Any, _settings.port);
+				_endpoint = new IPEndPoint(IPAddress.IPv6Any, _settings.port);
 			else if (string.Equals(_settings.ip.Trim(), "localhost", StringComparison.OrdinalIgnoreCase))
-				_endpoint = new IPEndPoint(IPAddress.Loopback, _settings.port);
+				_endpoint = new IPEndPoint(IPAddress.IPv6Loopback, _settings.port);
 			else
 				_endpoint = new IPEndPoint(IPAddress.Parse(_settings.ip), _settings.port);
 			_accepts = new SocketAsyncEventArgs[Math.Min(_settings.backlog, (int)SocketOptionName.MaxConnections)];
@@ -179,6 +179,7 @@ namespace Primer
 		private void Init()
 		{
 			_listener = new Socket(_endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp) { ExclusiveAddressUse = true };
+			_listener.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
 			_listener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger, new LingerOption(false, 0));
 		}
 
