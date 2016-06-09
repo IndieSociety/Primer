@@ -148,12 +148,14 @@ namespace Primer
 
 		protected abstract int PreTest(ByteBuffer buffer, byte[] bytes, int offset, int length);
 		protected abstract bool Test(ByteBuffer buffer);
-		internal abstract void Execute(Session session);
+		protected virtual void Clear() { }
 		public abstract bool Send(Session session);
+		internal abstract void Execute(Session session);
 
-		public virtual void Reset()
+		public void Reset()
 		{
 			buffer.Reset();
+			Clear();
 		}
 	}
 
@@ -245,9 +247,8 @@ namespace Primer
 			return true;
 		}
 
-		public override void Reset()
+		protected override void Clear()
 		{
-			base.Reset();
 			Value = null;
 		}
 	}
