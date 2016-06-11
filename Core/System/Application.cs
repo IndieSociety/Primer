@@ -34,13 +34,18 @@ namespace Primer
 	{
 		public static readonly DateTime UTCTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 		private static readonly Stopwatch sinceStartup = new Stopwatch();
-		private static long timeStartup;
+		private static double timeStartup;
 		private static readonly CancellationTokenSource cts = new CancellationTokenSource();
 		private static readonly List<KeyValuePair<Type, ModuleAttribute>> modules = new List<KeyValuePair<Type, ModuleAttribute>>();
 
 		public static long Now
 		{
-			get { return timeStartup + sinceStartup.ElapsedMilliseconds * 1000; }
+			get { return (long)((timeStartup + sinceStartup.Elapsed.TotalMilliseconds) * 1000); }
+		}
+
+		public static long Elapsed
+		{
+			get { return (long)(sinceStartup.Elapsed.TotalMilliseconds * 1000); }
 		}
 
 		public static CancellationToken RunState
@@ -70,7 +75,7 @@ namespace Primer
 		{
 			sinceStartup.Start();
 			TimeSpan ts = DateTime.UtcNow - UTCTime;
-			timeStartup = (long)(ts.TotalMilliseconds * 1000);
+			timeStartup = ts.TotalMilliseconds;
 			Thread.CurrentThread.Name = "Primer.Main";
 			Dictionary<Type, InitializeOnLoad> loadtypes = new Dictionary<Type, InitializeOnLoad>();
 			List<Type> loadlist = new List<Type>();

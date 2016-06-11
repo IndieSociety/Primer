@@ -608,7 +608,7 @@ namespace Primer
 							session.Start();
 						});
 					}
-					catch (ObjectDisposedException e)
+					catch (ObjectDisposedException)
 					{
 						evt.TrySetException(new TimeoutException());
 					}
@@ -671,7 +671,7 @@ namespace Primer
 									session.Start();
 								});
 							}
-							catch (ObjectDisposedException e)
+							catch (ObjectDisposedException)
 							{
 								evt.TrySetException(new TimeoutException());
 							}

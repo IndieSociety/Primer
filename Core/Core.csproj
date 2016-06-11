@@ -45,11 +45,9 @@
     <Compile Include="System\Application.cs" />
     <Compile Include="System\Buffer.cs" />
     <Compile Include="System\Console.cs" />
-    <Compile Include="System\Heap.cs" />
     <Compile Include="System\Log.cs" />
     <Compile Include="System\Loop.cs" />
     <Compile Include="System\Pool.cs" />
-    <Compile Include="System\Tools.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Database\" />
